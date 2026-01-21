@@ -38,6 +38,23 @@ npm start
 # Open http://localhost:3000
 ```
 
+## Priority Fix: Landing Page UX
+
+Current layout is confusing:
+```
+[Name input]
+[Create Game button]
+-- or --
+[Game code input] [Join Game button]
+```
+
+Problem: If joining a game, user has to look past "Create Game" to find join. Name input purpose is unclear.
+
+**Better approach:**
+- Two clear paths side-by-side or tabbed: "Create Game" vs "Join Game"
+- Name input appears after choosing which path
+- Or: Single flow where you enter code (optional) + name, then one button figures out create vs join
+
 ## Priority Fix: Card Placement UX
 
 The current interaction for placing cards is confusing. Players don't know where their card will go.
