@@ -73,6 +73,12 @@ Recommend option 2: Show player's unplaced card visually, let them drag it into 
 - You have a card to place
 - Where it will go when you drop it
 
+**Also: Current drag-and-drop is flaky.** Issues to investigate:
+- HTML5 drag-and-drop API is notoriously finicky
+- Consider using a library (SortableJS, or simple pointer events)
+- Or implement custom drag with mousedown/mousemove/mouseup
+- Need clear visual feedback: drag ghost, drop targets highlighted, insertion point indicator
+
 ## Known Issues / To Test
 - [ ] Fix card placement UX (priority)
 - [ ] Test with 2+ browsers to verify real-time sync
