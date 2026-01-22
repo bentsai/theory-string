@@ -252,12 +252,18 @@ function getFinalResults(code) {
   const game = getGame(code);
   if (!game || game.status !== 'ended') return null;
 
+  let prevNumber = -1;
   return game.cardLine.map(playerId => {
     const player = game.players.find(p => p.id === playerId);
+    const playerIndex = game.players.findIndex(p => p.id === playerId);
+    const isCorrect = player.number >= prevNumber;
+    prevNumber = player.number;
     return {
       playerId,
       name: player.name,
-      number: player.number
+      number: player.number,
+      playerIndex,
+      isCorrect
     };
   });
 }

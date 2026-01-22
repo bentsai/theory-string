@@ -353,19 +353,31 @@ function showResult(result, order) {
   resultTitle.className = result;
 
   finalOrder.innerHTML = '';
-  order.forEach((item, index) => {
+  order.forEach((item) => {
     const card = document.createElement('div');
-    card.className = 'result-card';
-    card.innerHTML = `
-      <span class="result-number">${item.number}</span>
-      <span class="result-name">${item.name}</span>
-    `;
+    card.className = 'card revealed';
 
-    // Mark if out of order
-    if (index > 0 && item.number < order[index - 1].number) {
-      card.classList.add('wrong');
+    // Add player color
+    card.classList.add(`player-${item.playerIndex % 10}`);
+
+    // Add correct/wrong styling
+    card.classList.add(item.isCorrect ? 'correct' : 'wrong');
+
+    // Highlight own card
+    if (item.playerId === myId) {
+      card.classList.add('my-card');
     }
 
+    const numberSpan = document.createElement('span');
+    numberSpan.className = 'card-number';
+    numberSpan.textContent = item.number;
+
+    const nameSpan = document.createElement('span');
+    nameSpan.className = 'card-name';
+    nameSpan.textContent = item.name;
+
+    card.appendChild(numberSpan);
+    card.appendChild(nameSpan);
     finalOrder.appendChild(card);
   });
 
