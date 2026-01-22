@@ -197,7 +197,7 @@ function updateGame(state) {
       if (i < state.cardLine.length) {
         const playerId = state.cardLine[i];
         const player = state.players.find(p => p.id === playerId);
-        const card = createCard(player, i, state.status);
+        const card = createCard(player, i, state.status, state.revealedCards);
         fieldset.appendChild(card);
       }
     }
@@ -207,7 +207,7 @@ function updateGame(state) {
     // No slots during reveal - just show cards
     state.cardLine.forEach((playerId, index) => {
       const player = state.players.find(p => p.id === playerId);
-      const card = createCard(player, index, state.status);
+      const card = createCard(player, index, state.status, state.revealedCards);
       cardLine.appendChild(card);
     });
   }
@@ -250,7 +250,7 @@ function updateGame(state) {
   }
 }
 
-function createCard(player, index, status) {
+function createCard(player, index, status, revealedCards) {
   const card = document.createElement('div');
   card.className = 'card';
   card.dataset.index = index;
@@ -260,6 +260,13 @@ function createCard(player, index, status) {
     card.classList.add('my-card');
   }
 
+  // Check if this card has been revealed
+  const revealedInfo = revealedCards && revealedCards[player.id];
+  if (revealedInfo) {
+    card.classList.add('revealed');
+    card.classList.add(revealedInfo.isCorrect ? 'correct' : 'wrong');
+  }
+
   // Card content
   const nameSpan = document.createElement('span');
   nameSpan.className = 'card-name';
@@ -267,7 +274,7 @@ function createCard(player, index, status) {
 
   const numberSpan = document.createElement('span');
   numberSpan.className = 'card-number';
-  numberSpan.textContent = '?';
+  numberSpan.textContent = revealedInfo ? revealedInfo.number : '?';
 
   card.appendChild(numberSpan);
   card.appendChild(nameSpan);

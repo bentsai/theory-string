@@ -212,6 +212,25 @@ function getGameState(code, playerId) {
 
   // Return game state with only this player's number visible
   const player = game.players.find(p => p.id === playerId);
+
+  // Build revealed cards info (cards that have been flipped)
+  const revealedCards = {};
+  if (game.status === 'revealing' || game.status === 'ended') {
+    let prevNumber = -1;
+    for (let i = 0; i < game.revealIndex; i++) {
+      const cardPlayerId = game.cardLine[i];
+      const cardPlayer = game.players.find(p => p.id === cardPlayerId);
+      if (cardPlayer) {
+        const isCorrect = cardPlayer.number >= prevNumber;
+        revealedCards[cardPlayerId] = {
+          number: cardPlayer.number,
+          isCorrect
+        };
+        prevNumber = cardPlayer.number;
+      }
+    }
+  }
+
   return {
     code: game.code,
     hostId: game.hostId,
@@ -224,6 +243,7 @@ function getGameState(code, playerId) {
     myNumber: player ? player.number : null,
     cardLine: game.cardLine,
     revealIndex: game.revealIndex,
+    revealedCards,
     result: game.result
   };
 }
