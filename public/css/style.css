@@ -300,6 +300,12 @@ input[type="text"]::placeholder {
   text-align: center;
 }
 
+.category-display-wrapper {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
 .category-display {
   font-size: 1.5rem;
   font-weight: 600;
@@ -307,11 +313,16 @@ input[type="text"]::placeholder {
   padding: 0.75rem 1.5rem;
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   border-radius: 8px;
-  display: none;
 }
 
-.category-display.visible {
-  display: inline-block;
+.category-edit-btn {
+  background: rgba(255, 255, 255, 0.2);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  color: #fff;
+}
+
+.category-edit-btn:hover {
+  background: rgba(255, 255, 255, 0.3);
 }
 
 .category-input-wrapper {
@@ -401,8 +412,23 @@ input[type="text"]::placeholder {
 }
 
 .card.revealed {
-  background: #fff !important;
-  border-color: #ccc !important;
+  /* Keep player color, just add white overlay */
+  position: relative;
+}
+
+.card.revealed::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: rgba(255, 255, 255, 0.7);
+  border-radius: 6px;
+  z-index: 0;
+}
+
+.card.revealed .card-number,
+.card.revealed .card-name {
+  position: relative;
+  z-index: 1;
 }
 
 .card.revealed .card-number {
@@ -410,14 +436,19 @@ input[type="text"]::placeholder {
   font-size: 2rem;
 }
 
+.card.revealed .card-name {
+  color: #333;
+  background: rgba(0, 0, 0, 0.1);
+}
+
 .card.correct {
   border-color: #4caf50 !important;
-  background: linear-gradient(135deg, #e8f5e9 0%, #c8e6c9 100%) !important;
+  box-shadow: 0 0 0 3px rgba(76, 175, 80, 0.3);
 }
 
 .card.wrong {
   border-color: #f44336 !important;
-  background: linear-gradient(135deg, #ffebee 0%, #ffcdd2 100%) !important;
+  box-shadow: 0 0 0 3px rgba(244, 67, 54, 0.3);
 }
 
 .card-number {

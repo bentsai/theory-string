@@ -108,6 +108,7 @@ function startRound(code, playerId) {
   game.cardLine = [];
   game.revealIndex = 0;
   game.result = null;
+  game.category = null;
 
   return { game };
 }

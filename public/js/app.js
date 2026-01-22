@@ -154,7 +154,9 @@ const placementHint = document.getElementById('placement-hint');
 const notPlacedList = document.getElementById('not-placed-list');
 const revealBtn = document.getElementById('reveal-btn');
 const gameStatus = document.getElementById('game-status');
+const categoryDisplayWrapper = document.getElementById('category-display-wrapper');
 const categoryDisplay = document.getElementById('category-display');
+const categoryEditBtn = document.getElementById('category-edit-btn');
 const categoryInputWrapper = document.getElementById('category-input-wrapper');
 const categoryInput = document.getElementById('category-input');
 const categorySetBtn = document.getElementById('category-set-btn');
@@ -172,6 +174,7 @@ function submitCategory() {
   const category = categoryInput.value.trim();
   if (category) {
     socket.emit('set-category', category);
+    categoryInput.value = '';
   }
 }
 
@@ -182,6 +185,14 @@ categoryInput.addEventListener('keypress', (e) => {
   }
 });
 
+// Edit category - show input with current value
+categoryEditBtn.addEventListener('click', () => {
+  categoryInput.value = gameState.category || '';
+  categoryDisplayWrapper.style.display = 'none';
+  categoryInputWrapper.style.display = 'flex';
+  categoryInput.focus();
+});
+
 function updateGame(state) {
   gameState = state;
   yourNumberSpan.textContent = state.myNumber || '?';
@@ -190,10 +201,12 @@ function updateGame(state) {
   const amHost = state.hostId === myId;
   if (state.category) {
     categoryDisplay.textContent = state.category;
-    categoryDisplay.classList.add('visible');
+    categoryDisplayWrapper.style.display = 'inline-flex';
     categoryInputWrapper.style.display = 'none';
+    // Show edit button for host during playing phase
+    categoryEditBtn.style.display = (amHost && state.status === 'playing') ? 'inline-block' : 'none';
   } else {
-    categoryDisplay.classList.remove('visible');
+    categoryDisplayWrapper.style.display = 'none';
     // Show input for host only during playing phase
     if (amHost && state.status === 'playing') {
       categoryInputWrapper.style.display = 'flex';
