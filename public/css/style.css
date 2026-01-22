@@ -609,19 +609,21 @@ input[type="text"]::placeholder {
   padding: 1rem;
 }
 
-/* Leave Game Button */
+/* Leave Game Button - subtle text link style */
 .leave-game-btn {
   margin-top: 2rem;
-  opacity: 0.7;
   font-size: 0.875rem;
   align-self: center;
-  background: #e0e0e0;
-  color: #636e72;
+  background: transparent;
+  color: #999;
+  padding: 0.5rem 1rem;
+  text-decoration: underline;
+  text-underline-offset: 2px;
 }
 
 .leave-game-btn:hover {
-  opacity: 1;
-  background: #d0d0d0;
+  color: #636e72;
+  background: transparent;
 }
 
 /* Center lobby actions */
