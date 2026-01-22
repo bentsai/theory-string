@@ -19,51 +19,102 @@ io.on('connection', (socket) => {
 
   let currentGame = null;
   let playerName = null;
+  let currentPlayerId = null;
 
   // Create a new game
-  socket.on('create-game', (name) => {
+  socket.on('create-game', ({ playerId, name }) => {
     playerName = name;
-    const gameData = game.createGame(socket.id, name);
+    currentPlayerId = playerId;
+    const gameData = game.createGame(playerId, name);
     currentGame = gameData.code;
+    game.setPlayerSocket(currentGame, playerId, socket.id);
     socket.join(currentGame);
     socket.emit('game-created', { code: currentGame });
-    socket.emit('game-state', game.getGameState(currentGame, socket.id));
+    socket.emit('game-state', game.getGameState(currentGame, playerId));
   });
 
   // Join an existing game
-  socket.on('join-game', ({ code, name }) => {
-    const result = game.joinGame(code.toUpperCase(), socket.id, name);
+  socket.on('join-game', ({ code, name, playerId }) => {
+    const result = game.joinGame(code.toUpperCase(), playerId, name);
     if (result.error) {
       socket.emit('error', result.error);
       return;
     }
 
     playerName = name;
+    currentPlayerId = playerId;
     currentGame = code.toUpperCase();
+    game.setPlayerSocket(currentGame, playerId, socket.id);
     socket.join(currentGame);
 
     // Notify everyone in the game
-    const player = { id: socket.id, name };
+    const player = { id: playerId, name };
     socket.to(currentGame).emit('player-joined', player);
     socket.emit('game-joined', { code: currentGame });
-
-    // Send current game state to all players
-    io.to(currentGame).emit('game-state', game.getGameState(currentGame, socket.id));
 
     // Send personalized state to each player (for their number)
     const gameData = game.getGame(currentGame);
     if (gameData) {
       gameData.players.forEach(p => {
-        io.to(p.id).emit('game-state', game.getGameState(currentGame, p.id));
+        const socketId = game.getPlayerSocket(currentGame, p.id);
+        if (socketId) {
+          io.to(socketId).emit('game-state', game.getGameState(currentGame, p.id));
+        }
       });
     }
   });
 
+  // Rejoin after page reload
+  socket.on('rejoin-game', ({ code, name, playerId }) => {
+    const gameData = game.getGame(code.toUpperCase());
+    if (!gameData) {
+      socket.emit('rejoin-failed');
+      return;
+    }
+
+    const player = gameData.players.find(p => p.id === playerId);
+    if (!player) {
+      socket.emit('rejoin-failed');
+      return;
+    }
+
+    // Update socket mapping and rejoin room
+    playerName = name;
+    currentPlayerId = playerId;
+    currentGame = code.toUpperCase();
+    game.setPlayerSocket(currentGame, playerId, socket.id);
+    socket.join(currentGame);
+
+    // Send current state to rejoined player
+    socket.emit('game-joined', { code: currentGame });
+    socket.emit('game-state', game.getGameState(currentGame, playerId));
+
+    // If they had a number, send it
+    if (player.number !== null) {
+      socket.emit('round-started', { yourNumber: player.number });
+    }
+
+    console.log(`Player ${name} (${playerId}) rejoined game ${currentGame}`);
+  });
+
+  // Helper to send state to all players in a game
+  function broadcastGameState(gameCode) {
+    const gameData = game.getGame(gameCode);
+    if (gameData) {
+      gameData.players.forEach(p => {
+        const socketId = game.getPlayerSocket(gameCode, p.id);
+        if (socketId) {
+          io.to(socketId).emit('game-state', game.getGameState(gameCode, p.id));
+        }
+      });
+    }
+  }
+
   // Start a new round
   socket.on('start-round', () => {
-    if (!currentGame) return;
+    if (!currentGame || !currentPlayerId) return;
 
-    const result = game.startRound(currentGame, socket.id);
+    const result = game.startRound(currentGame, currentPlayerId);
     if (result.error) {
       socket.emit('error', result.error);
       return;
@@ -71,36 +122,31 @@ io.on('connection', (socket) => {
 
     // Send personalized state to each player (with their number)
     result.game.players.forEach(p => {
-      io.to(p.id).emit('round-started', {
-        yourNumber: p.number
-      });
-      io.to(p.id).emit('game-state', game.getGameState(currentGame, p.id));
+      const socketId = game.getPlayerSocket(currentGame, p.id);
+      if (socketId) {
+        io.to(socketId).emit('round-started', { yourNumber: p.number });
+        io.to(socketId).emit('game-state', game.getGameState(currentGame, p.id));
+      }
     });
   });
 
   // Place a card
   socket.on('place-card', (position) => {
-    if (!currentGame) return;
+    if (!currentGame || !currentPlayerId) return;
 
-    const result = game.placeCard(currentGame, socket.id, position);
+    const result = game.placeCard(currentGame, currentPlayerId, position);
     if (result.error) {
       socket.emit('error', result.error);
       return;
     }
 
     io.to(currentGame).emit('card-placed', {
-      playerId: socket.id,
+      playerId: currentPlayerId,
       playerName,
       position: result.position
     });
 
-    // Update game state for all
-    const gameData = game.getGame(currentGame);
-    if (gameData) {
-      gameData.players.forEach(p => {
-        io.to(p.id).emit('game-state', game.getGameState(currentGame, p.id));
-      });
-    }
+    broadcastGameState(currentGame);
   });
 
   // Move a card
@@ -114,14 +160,7 @@ io.on('connection', (socket) => {
     }
 
     io.to(currentGame).emit('card-moved', { fromIndex, toIndex });
-
-    // Update game state for all
-    const gameData = game.getGame(currentGame);
-    if (gameData) {
-      gameData.players.forEach(p => {
-        io.to(p.id).emit('game-state', game.getGameState(currentGame, p.id));
-      });
-    }
+    broadcastGameState(currentGame);
   });
 
   // Start reveal phase
@@ -135,14 +174,7 @@ io.on('connection', (socket) => {
     }
 
     io.to(currentGame).emit('reveal-started');
-
-    // Update game state for all
-    const gameData = game.getGame(currentGame);
-    if (gameData) {
-      gameData.players.forEach(p => {
-        io.to(p.id).emit('game-state', game.getGameState(currentGame, p.id));
-      });
-    }
+    broadcastGameState(currentGame);
   });
 
   // Reveal next card
@@ -164,20 +196,14 @@ io.on('connection', (socket) => {
       });
     }
 
-    // Update game state for all
-    const gameData = game.getGame(currentGame);
-    if (gameData) {
-      gameData.players.forEach(p => {
-        io.to(p.id).emit('game-state', game.getGameState(currentGame, p.id));
-      });
-    }
+    broadcastGameState(currentGame);
   });
 
   // Play again
   socket.on('play-again', () => {
-    if (!currentGame) return;
+    if (!currentGame || !currentPlayerId) return;
 
-    const result = game.startRound(currentGame, socket.id);
+    const result = game.startRound(currentGame, currentPlayerId);
     if (result.error) {
       socket.emit('error', result.error);
       return;
@@ -185,30 +211,19 @@ io.on('connection', (socket) => {
 
     // Send personalized state to each player (with their number)
     result.game.players.forEach(p => {
-      io.to(p.id).emit('round-started', {
-        yourNumber: p.number
-      });
-      io.to(p.id).emit('game-state', game.getGameState(currentGame, p.id));
+      const socketId = game.getPlayerSocket(currentGame, p.id);
+      if (socketId) {
+        io.to(socketId).emit('round-started', { yourNumber: p.number });
+        io.to(socketId).emit('game-state', game.getGameState(currentGame, p.id));
+      }
     });
   });
 
-  // Handle disconnect
+  // Handle disconnect - don't remove player immediately, allow reconnect
   socket.on('disconnect', () => {
     console.log('Player disconnected:', socket.id);
-    if (currentGame) {
-      const updatedGame = game.removePlayer(currentGame, socket.id);
-      if (updatedGame) {
-        io.to(currentGame).emit('player-left', { playerId: socket.id, playerName });
-
-        // Update game state for remaining players
-        updatedGame.players.forEach(p => {
-          io.to(p.id).emit('game-state', game.getGameState(currentGame, p.id));
-        });
-
-        // Notify about new host if changed
-        io.to(currentGame).emit('host-changed', { newHostId: updatedGame.hostId });
-      }
-    }
+    // Don't remove player from game - they might reconnect
+    // The game cleanup timer will handle stale games
   });
 });
 

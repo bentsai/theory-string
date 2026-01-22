@@ -252,6 +252,21 @@ setInterval(() => {
   }
 }, 60000); // Check every minute
 
+// Socket ID mapping (playerId -> socketId) per game
+const socketMappings = new Map();
+
+function setPlayerSocket(code, playerId, socketId) {
+  if (!socketMappings.has(code)) {
+    socketMappings.set(code, new Map());
+  }
+  socketMappings.get(code).set(playerId, socketId);
+}
+
+function getPlayerSocket(code, playerId) {
+  const gameMap = socketMappings.get(code);
+  return gameMap ? gameMap.get(playerId) : null;
+}
+
 module.exports = {
   createGame,
   getGame,
@@ -263,5 +278,7 @@ module.exports = {
   startReveal,
   revealNext,
   getGameState,
-  getFinalResults
+  getFinalResults,
+  setPlayerSocket,
+  getPlayerSocket
 };

@@ -1,9 +1,19 @@
 // Connect to Socket.io
 const socket = io();
 
+// Generate or retrieve persistent player ID
+function getPlayerId() {
+  let id = sessionStorage.getItem('playerId');
+  if (!id) {
+    id = 'p_' + Math.random().toString(36).substr(2, 9);
+    sessionStorage.setItem('playerId', id);
+  }
+  return id;
+}
+
 // State
 let gameState = null;
-let myId = null;
+let myId = getPlayerId();
 let isHost = false;
 let myNumber = null;
 
@@ -60,7 +70,8 @@ createGameBtn.addEventListener('click', () => {
     landingError.textContent = 'Please enter your name';
     return;
   }
-  socket.emit('create-game', name);
+  sessionStorage.setItem('playerName', name);
+  socket.emit('create-game', { playerId: myId, name });
 });
 
 joinGameBtn.addEventListener('click', () => {
@@ -74,7 +85,9 @@ joinGameBtn.addEventListener('click', () => {
     landingError.textContent = 'Please enter your name';
     return;
   }
-  socket.emit('join-game', { code, name });
+  sessionStorage.setItem('playerName', name);
+  sessionStorage.setItem('gameCode', code);
+  socket.emit('join-game', { code, name, playerId: myId });
 });
 
 // Lobby Screen
@@ -348,15 +361,28 @@ function showResult(result, order) {
 
 // Socket Events
 socket.on('connect', () => {
-  myId = socket.id;
+  // Attempt to rejoin if we have stored session
+  const storedCode = sessionStorage.getItem('gameCode');
+  const storedName = sessionStorage.getItem('playerName');
+  if (storedCode && storedName) {
+    socket.emit('rejoin-game', { code: storedCode, name: storedName, playerId: myId });
+  }
 });
 
 socket.on('game-created', ({ code }) => {
+  sessionStorage.setItem('gameCode', code);
   showScreen('lobby');
 });
 
 socket.on('game-joined', ({ code }) => {
+  sessionStorage.setItem('gameCode', code);
   showScreen('lobby');
+});
+
+socket.on('rejoin-failed', () => {
+  // Clear stale session data
+  sessionStorage.removeItem('gameCode');
+  sessionStorage.removeItem('playerName');
 });
 
 socket.on('game-state', (state) => {
