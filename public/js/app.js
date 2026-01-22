@@ -186,8 +186,11 @@ revealBtn.addEventListener('click', () => {
 
 // Category input handlers
 function submitCategory() {
+  console.log('submitCategory called');
   const category = categoryInput.value.trim();
+  console.log('category value:', category);
   if (category) {
+    console.log('emitting set-category');
     socket.emit('set-category', category);
     categoryInput.value = '';
   }

@@ -174,9 +174,14 @@ io.on('connection', (socket) => {
 
   // Set category
   socket.on('set-category', (category) => {
-    if (!currentGame || !currentPlayerId) return;
+    console.log('set-category received:', { category, currentGame, currentPlayerId });
+    if (!currentGame || !currentPlayerId) {
+      console.log('set-category early return - missing game/player');
+      return;
+    }
 
     const result = game.setCategory(currentGame, currentPlayerId, category);
+    console.log('setCategory result:', result.error || 'success');
     if (result.error) {
       socket.emit('error', result.error);
       return;
