@@ -612,19 +612,20 @@ input[type="text"]::placeholder {
 /* Leave Game - plain text link */
 .leave-game-btn {
   margin-top: 2rem;
-  font-size: 0.8rem;
+  font-size: 1rem;
   align-self: center;
   background: none;
-  color: #bbb;
+  color: #888;
   padding: 0;
   border: none;
   border-radius: 0;
   font-weight: 400;
   box-shadow: none;
+  cursor: pointer;
 }
 
 .leave-game-btn:hover {
-  color: #888;
+  color: #555;
   background: none !important;
   transform: none;
   text-decoration: underline;
