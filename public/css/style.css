@@ -625,9 +625,10 @@ input[type="text"]::placeholder {
 
 .leave-game-btn:hover {
   color: #888;
-  background: none;
+  background: none !important;
   transform: none;
   text-decoration: underline;
+  box-shadow: none;
 }
 
 /* Center lobby actions */
