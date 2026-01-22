@@ -328,7 +328,6 @@ function createCard(player, index, status, revealedCards, playerIndex) {
   const revealedInfo = revealedCards && revealedCards[player.id];
   if (revealedInfo) {
     card.classList.add('revealed');
-    card.classList.add(revealedInfo.isCorrect ? 'correct' : 'wrong');
   }
 
   // Card content
@@ -423,9 +422,6 @@ function showResult(result, order) {
     // Add player color
     card.classList.add(`player-${item.playerIndex % 10}`);
 
-    // Add correct/wrong styling
-    card.classList.add(item.isCorrect ? 'correct' : 'wrong');
-
     // Highlight own card
     if (item.playerId === myId) {
       card.classList.add('my-card');
@@ -515,14 +511,13 @@ socket.on('player-left', ({ playerId, playerName }) => {
   setTimeout(() => gameStatus.textContent = '', 3000);
 });
 
-socket.on('card-revealed', ({ index, playerId, playerName, number, isCorrect }) => {
+socket.on('card-revealed', ({ index, number }) => {
   const cards = cardLine.querySelectorAll('.card');
   if (cards[index]) {
     const card = cards[index];
     const numberSpan = card.querySelector('.card-number');
     numberSpan.textContent = number;
     card.classList.add('revealed');
-    card.classList.add(isCorrect ? 'correct' : 'wrong');
   }
 });
 

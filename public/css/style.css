@@ -441,15 +441,6 @@ input[type="text"]::placeholder {
   background: rgba(0, 0, 0, 0.1);
 }
 
-.card.correct {
-  border-color: #4caf50 !important;
-  box-shadow: 0 0 0 3px rgba(76, 175, 80, 0.3);
-}
-
-.card.wrong {
-  border-color: #f44336 !important;
-  box-shadow: 0 0 0 3px rgba(244, 67, 54, 0.3);
-}
 
 .card-number {
   font-size: 2rem;
