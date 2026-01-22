@@ -580,6 +580,17 @@ input[type="text"]::placeholder {
   padding: 1rem;
 }
 
+/* Leave Game Button */
+.leave-game-btn {
+  margin-top: 2rem;
+  opacity: 0.7;
+  font-size: 0.875rem;
+}
+
+.leave-game-btn:hover {
+  opacity: 1;
+}
+
 /* Responsive */
 @media (max-width: 480px) {
   h1 {

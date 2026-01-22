@@ -256,6 +256,31 @@ io.on('connection', (socket) => {
     });
   });
 
+  // Leave game explicitly
+  socket.on('leave-game', () => {
+    if (!currentGame || !currentPlayerId) return;
+
+    const result = game.removePlayer(currentGame, currentPlayerId);
+    if (result) {
+      // Notify remaining players
+      socket.to(currentGame).emit('player-left', {
+        playerId: currentPlayerId,
+        playerName: playerName
+      });
+      // If host changed, notify
+      if (result.hostId !== currentPlayerId) {
+        io.to(currentGame).emit('host-changed', { newHostId: result.hostId });
+      }
+      broadcastGameState(currentGame);
+    }
+
+    socket.leave(currentGame);
+    currentGame = null;
+    currentPlayerId = null;
+    playerName = null;
+    console.log('Player left game explicitly');
+  });
+
   // Handle disconnect - don't remove player immediately, allow reconnect
   socket.on('disconnect', () => {
     console.log('Player disconnected:', socket.id);

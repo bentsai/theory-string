@@ -426,6 +426,27 @@ playAgainBtn.addEventListener('click', () => {
   }
 });
 
+// Leave Game - all leave buttons use the same class
+function leaveGame() {
+  // Clear session data
+  sessionStorage.removeItem('gameCode');
+  sessionStorage.removeItem('playerName');
+  // Clear URL hash
+  history.replaceState(null, '', window.location.pathname);
+  // Reset local state
+  gameState = null;
+  myNumber = null;
+  isHost = false;
+  // Notify server
+  socket.emit('leave-game');
+  // Show landing page
+  showScreen('landing');
+}
+
+document.querySelectorAll('.leave-game-btn').forEach(btn => {
+  btn.addEventListener('click', leaveGame);
+});
+
 function showResult(result, order) {
   resultTitle.textContent = result === 'win' ? 'You Win!' : 'You Lose!';
   resultTitle.className = result;
