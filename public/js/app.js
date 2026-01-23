@@ -163,6 +163,7 @@ function updateLobby(state) {
 }
 
 // Game Screen
+const yourNumberDisplay = document.getElementById('your-number-display');
 const yourNumberSpan = document.getElementById('your-number');
 const cardLine = document.getElementById('card-line');
 const placementHint = document.getElementById('placement-hint');
@@ -222,6 +223,14 @@ categoryEditBtn.addEventListener('click', () => {
 function updateGame(state) {
   gameState = state;
   yourNumberSpan.textContent = state.myNumber || '?';
+
+  // Apply player color to number display
+  const myPlayerIndex = state.players.findIndex(p => p.id === myId);
+  // Remove existing player color classes
+  yourNumberDisplay.className = 'your-number';
+  if (myPlayerIndex !== -1) {
+    yourNumberDisplay.classList.add(`player-${myPlayerIndex % 10}`);
+  }
 
   // Update category display
   const amHost = state.hostId === myId;
