@@ -375,7 +375,8 @@ input[type="text"]::placeholder {
 }
 
 .card-area {
-  width: 100%;
+  width: calc(100vw - 3rem);
+  max-width: 1200px;
   background: #fff;
   border-radius: 12px;
   padding: 1.5rem;
