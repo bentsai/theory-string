@@ -466,14 +466,14 @@ document.querySelectorAll('.leave-game-btn').forEach(btn => {
   btn.addEventListener('click', leaveGame);
 });
 
-function showResult(result, order) {
+function showResult(result, order, category) {
   resultTitle.textContent = result === 'win' ? 'You Win!' : 'You Lose!';
   resultTitle.className = result;
 
   // Show category if one was set
   const resultCategory = document.getElementById('result-category');
-  if (gameState && gameState.category) {
-    resultCategory.textContent = gameState.category;
+  if (category) {
+    resultCategory.textContent = category;
     resultCategory.style.display = 'block';
   } else {
     resultCategory.style.display = 'none';
@@ -591,8 +591,8 @@ socket.on('card-revealed', ({ index, number }) => {
   }
 });
 
-socket.on('round-ended', ({ result, finalOrder: order }) => {
-  showResult(result, order);
+socket.on('round-ended', ({ result, finalOrder: order, category }) => {
+  showResult(result, order, category);
 });
 
 socket.on('host-changed', ({ newHostId }) => {

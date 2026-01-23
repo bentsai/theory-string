@@ -93,7 +93,8 @@ io.on('connection', (socket) => {
     if (gameData.status === 'ended') {
       socket.emit('round-ended', {
         result: gameData.result,
-        finalOrder: game.getFinalResults(currentGame)
+        finalOrder: game.getFinalResults(currentGame),
+        category: gameData.category
       });
     }
 
@@ -213,7 +214,8 @@ io.on('connection', (socket) => {
       if (revealResult.game.status === 'ended') {
         io.to(currentGame).emit('round-ended', {
           result: revealResult.game.result,
-          finalOrder: game.getFinalResults(currentGame)
+          finalOrder: game.getFinalResults(currentGame),
+          category: revealResult.game.category
         });
       }
     }
@@ -236,7 +238,8 @@ io.on('connection', (socket) => {
     if (result.game.status === 'ended') {
       io.to(currentGame).emit('round-ended', {
         result: result.game.result,
-        finalOrder: game.getFinalResults(currentGame)
+        finalOrder: game.getFinalResults(currentGame),
+        category: result.game.category
       });
     }
 
