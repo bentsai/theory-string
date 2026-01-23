@@ -300,5 +300,5 @@ io.on('connection', (socket) => {
 });
 
 server.listen(PORT, () => {
-  console.log(`Ito Online server running on http://localhost:${PORT}`);
+  console.log(`Theory String server running on http://localhost:${PORT}`);
 });

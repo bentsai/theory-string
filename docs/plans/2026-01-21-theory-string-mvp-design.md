@@ -1,8 +1,8 @@
-# Ito Online - MVP Design
+# Theory String - MVP Design
 
 ## Overview
 
-A web-based implementation of the cooperative card game "ito" where players receive secret numbers (1-100) and must arrange their cards in ascending order without revealing their exact values.
+A web-based cooperative party game where players receive secret numbers (1-100) and must arrange their cards in ascending order without revealing their exact values.
 
 ## User Flow
 
@@ -121,7 +121,7 @@ game: {
 ## File Structure
 
 ```
-ito-online/
+theory-string/
 ├── server/
 │   ├── index.js          # Express + Socket.io setup
 │   ├── game.js           # Game state management

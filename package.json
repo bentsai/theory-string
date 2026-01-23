@@ -1,7 +1,7 @@
 {
-  "name": "ito-online",
+  "name": "theory-string",
   "version": "1.0.0",
-  "description": "Online multiplayer version of the cooperative card game ito",
+  "description": "Online multiplayer cooperative party game",
   "main": "server/index.js",
   "scripts": {
     "start": "node server/index.js",

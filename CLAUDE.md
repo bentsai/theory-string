@@ -1,7 +1,7 @@
-# Ito Online - Project Context
+# Theory String - Project Context
 
 ## What This Is
-Online multiplayer version of the cooperative card game "ito". Players get secret numbers (1-100), discuss vaguely via external voice chat, arrange face-down cards in ascending order, then reveal to see if they got it right.
+Online multiplayer cooperative party game. Players get secret numbers (1-100), discuss vaguely via external voice chat, arrange face-down cards in ascending order, then reveal to see if they got it right.
 
 ## Current State: MVP shipped
 
@@ -43,7 +43,7 @@ npm start
 - [ ] Mobile responsiveness
 
 ## Design Doc
-Full design spec at: `docs/plans/2026-01-21-ito-online-mvp-design.md`
+Full design spec at: `docs/plans/2026-01-21-theory-string-mvp-design.md`
 
 ## Next Steps (if MVP works)
 - Add theme/clue prompts for describing numbers
