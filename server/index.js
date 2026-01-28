@@ -225,9 +225,14 @@ io.on('connection', (socket) => {
 
   // Reveal next card
   socket.on('reveal-next', () => {
+    console.log('reveal-next received:', { currentGame, timestamp: Date.now() });
     if (!currentGame) return;
 
+    const gameData = game.getGame(currentGame);
+    console.log('Before revealNext:', { revealIndex: gameData?.revealIndex, cardLineLength: gameData?.cardLine?.length });
+
     const result = game.revealNext(currentGame);
+    console.log('After revealNext:', { revealIndex: result.game?.revealIndex, status: result.game?.status });
     if (result.error) {
       socket.emit('error', result.error);
       return;

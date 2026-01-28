@@ -185,17 +185,24 @@ console.log('Category elements found:', {
 // Debounce reveal button to prevent multiple rapid clicks
 let lastRevealClickTime = 0;
 revealBtn.addEventListener('click', () => {
+  console.log('Reveal button clicked:', { isHost, status: gameState?.status, timestamp: Date.now() });
+
   // Only host can reveal
   if (!isHost) return;
 
   // Debounce to prevent rapid multiple clicks
   const now = Date.now();
-  if (now - lastRevealClickTime < 500) return;
+  if (now - lastRevealClickTime < 500) {
+    console.log('Debounced - too soon after last click');
+    return;
+  }
   lastRevealClickTime = now;
 
   if (gameState.status === 'playing') {
+    console.log('Emitting start-reveal');
     socket.emit('start-reveal');
   } else if (gameState.status === 'revealing') {
+    console.log('Emitting reveal-next');
     socket.emit('reveal-next');
   }
 });
@@ -597,6 +604,7 @@ socket.on('player-left', ({ playerId, playerName }) => {
 });
 
 socket.on('card-revealed', ({ index, number }) => {
+  console.log('card-revealed received:', { index, number, timestamp: Date.now() });
   const cards = cardLine.querySelectorAll('.card');
   if (cards[index]) {
     const card = cards[index];
