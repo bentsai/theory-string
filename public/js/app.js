@@ -568,6 +568,12 @@ socket.on('rejoin-failed', () => {
 });
 
 socket.on('game-state', (state) => {
+  console.log('game-state received:', {
+    status: state.status,
+    revealIndex: state.revealIndex,
+    revealedCardsCount: state.revealedCards ? Object.keys(state.revealedCards).length : 0,
+    timestamp: Date.now()
+  });
   gameState = state;
   isHost = state.hostId === myId;
 
@@ -615,6 +621,7 @@ socket.on('card-revealed', ({ index, number }) => {
 });
 
 socket.on('round-ended', ({ result, finalOrder: order, category }) => {
+  console.log('round-ended received:', { result, orderLength: order?.length, timestamp: Date.now() });
   showResult(result, order, category);
 });
 
